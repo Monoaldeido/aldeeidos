@@ -4,10 +4,10 @@ uniform vec3 Centre;  // Relative to the current render camera, not player posit
 uniform float SceneAge; // Ticks plus partial ticks from server-synchronised entity.
 uniform float Quality;
 
-const float PI = 3.14159265359;
-const vec3 CYAN = vec3(0.12, 0.96, 0.77);
-const vec3 VIOLET = vec3(0.38, 0.16, 0.80);
-const vec3 GOLD = vec3(1.00, 0.72, 0.23);
+const float WG_PI = 3.14159265359;
+const vec3 WG_CYAN = vec3(0.12, 0.96, 0.77);
+const vec3 WG_VIOLET = vec3(0.38, 0.16, 0.80);
+const vec3 WG_GOLD = vec3(1.00, 0.72, 0.23);
 
 float sat(float x){return clamp(x,0.,1.);}
 float ease(float a,float b,float x){float t=sat((x-a)/max(.001,b-a));return t*t*(3.-2.*t);}
@@ -34,7 +34,7 @@ vec3 groundFx(vec3 scene,vec3 p,float age) {
         // Rune spokes, geometric wedges and travelling signal, not random particles.
         float sector=abs(sin(polar*12.));
         float wedges=pow(max(0.,1.-sector),12.)*softBand(r,27.,11.);
-        float cell=abs(fract(polar*16./(PI*2.)+.5)-.5);
+        float cell=abs(fract(polar*16./(WG_PI*2.)+.5)-.5);
         float lettering=softBand(cell,.49,.014)*softBand(r,31.,2.);
         glow+=(rings*.47+wedges*.45+lettering*.3)*sigil;
         // Physical impact has its own expanding front and fractured secondary rings.
@@ -46,7 +46,7 @@ vec3 groundFx(vec3 scene,vec3 p,float age) {
         glow+=impact*(wave*2.15+pyro*.7);
     }
     float lit=glow*(.43+.57*max(0.,dot(normalize(vec3(local.x,10.,local.z)),vec3(0.,1.,0.))));
-    vec3 radiant=mix(CYAN,GOLD,impact*.74);
+    vec3 radiant=mix(WG_CYAN,WG_GOLD,impact*.74);
     return scene*(1.+radiant*lit*.5)+radiant*glow*.63;
 }
 
@@ -71,14 +71,14 @@ vec3 portalFx(vec3 scene,vec3 ro,vec3 rd,float depth,float age){
     float blades=softBand(radius,1.0+sin(angular*12.-age*.09)*.04,.025);
     float core=sat((1.01-radius)*11.0)*(.55+.45*sin(radius*80.-age*.4+waves));
     float pulse=(.42+.58*sin(age*.17))*phase;
-    vec3 plasma=mix(VIOLET,CYAN,softBand(radius,.86,.32));
+    vec3 plasma=mix(WG_VIOLET,WG_CYAN,softBand(radius,.86,.32));
     vec3 rift=mix(vec3(.015,.02,.08),plasma*.65,core*.8);
     float mask=phase*(core*.83+outer*.95+blades*.66);
     scene=mix(scene,rift,sat(mask));
-    scene+=(plasma*outer*1.9 + CYAN*blades*.56 + vec3(.85,.96,1.)*softBand(radius,1.,.009)*2.1)*pulse;
+    scene+=(plasma*outer*1.9 + WG_CYAN*blades*.56 + vec3(.85,.96,1.)*softBand(radius,1.,.009)*2.1)*pulse;
     // A delayed split of the rift, i.e. a transition rather than a hard cut.
     float shutter=win(60.,70.,84.,95.,age);
-    scene+=CYAN*shutter*softBand(abs(uv.y),.04,.06)*softBand(radius,.85,.35);
+    scene+=WG_CYAN*shutter*softBand(abs(uv.y),.04,.06)*softBand(radius,.85,.35);
     return scene;
 }
 
@@ -101,7 +101,7 @@ vec3 tornadoFx(vec3 scene,vec3 rd,float depth,float age){
     if(strength<.002)return scene;
     float globalSpin=(age-140.)*.048;
     for(int i=0;i<5;i++){
-        float angle=float(i)*2.*PI/5.+globalSpin;
+        float angle=float(i)*2.*WG_PI/5.+globalSpin;
         vec3 column=Centre+vec3(cos(angle)*28.,0.,sin(angle)*28.);
         vec2 interval=cylinder(rd,column,7.);
         if(interval.y<=0. || interval.x>depth)continue;
@@ -126,7 +126,7 @@ vec3 tornadoFx(vec3 scene,vec3 rd,float depth,float age){
             float cloud=softBand(r,cone,1.9)*.08;
             float weight=shell*(thread*.85+thread2*.8+knots*.22)+cloud;
             density+=weight;
-            fog+=mix(VIOLET,CYAN,sat(h/32.))*weight;
+            fog+=mix(WG_VIOLET,WG_CYAN,sat(h/32.))*weight;
         }
         float a=sat(density*.23*strength);
         scene=mix(scene,scene*.38+fog*.28,a);
@@ -138,16 +138,16 @@ vec3 tornadoFx(vec3 scene,vec3 rd,float depth,float age){
 vec3 atmosphericFx(vec3 scene,vec3 rd,float age){
     float shade=win(4.,30.,304.,350.,age);
     float invasion=win(15.,45.,250.,315.,age);
-    vec3 sky=scene*mix(1.,.20,.65*shade)+VIOLET*.11*shade;
+    vec3 sky=scene*mix(1.,.20,.65*shade)+WG_VIOLET*.11*shade;
     // Fine procedural meteor-line stars, only on actual sky pixels.
     vec2 cell=floor((rd.xz/(.4+abs(rd.y)))*95.);
     float star=step(.9945,h12(cell));
     float glint=star*pow(max(0.,sin(age*.033+h12(cell*3.)*6.28)),12.);
-    float streaks=softBand(fract(atan(rd.z,rd.x)*30./PI+age*.01),.5,.02)
+    float streaks=softBand(fract(atan(rd.z,rd.x)*30./WG_PI+age*.01),.5,.02)
                  *pow(1.-abs(rd.y),4.)*.15;
-    sky+=(CYAN*glint*1.4+VIOLET*streaks)*shade;
+    sky+=(WG_CYAN*glint*1.4+WG_VIOLET*streaks)*shade;
     float lightburst=win(261.,263.,264.,269.,age);
-    sky+=mix(CYAN,GOLD,.8)*lightburst*.30;
+    sky+=mix(WG_CYAN,WG_GOLD,.8)*lightburst*.30;
     return mix(scene,sky,shade);
 }
 
@@ -166,12 +166,12 @@ void main(){
     // Energy snap: only 3 frames, not several seconds of blinding light.
     float snap=win(263.,264.,265.,267.,age);
     float mono=dot(scene,vec3(.299,.587,.114));
-    scene=mix(scene,vec3(1.-mono)*.94+CYAN*.13,snap*.60);
+    scene=mix(scene,vec3(1.-mono)*.94+WG_CYAN*.13,snap*.60);
     // Saturated colour fringe emanating from the contact point.
     float post=win(265.,268.,305.,332.,age);
     vec2 offset=texCoord-.5;
     float rays=pow(max(0.,cos(atan(offset.y,offset.x)*18.+age*.04)),24.);
-    scene+=mix(GOLD,CYAN,.4)*rays*post*.07;
+    scene+=mix(WG_GOLD,WG_CYAN,.4)*rays*post*.07;
     // Fade the visual system cleanly; outside its lifetime the original scene returns.
     float visibility=win(0.,7.,325.,350.,age);
     fragColor=vec4(mix(original,scene,visibility),1.);
