@@ -1,0 +1,3 @@
+wg/**/build/
+wg/**/.gradle/
+wg/**/libs/*.jar
