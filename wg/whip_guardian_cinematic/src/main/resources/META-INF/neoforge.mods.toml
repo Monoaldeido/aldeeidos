@@ -1,0 +1,45 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All Rights Reserved (original uploaded model); original addon source: user project"
+
+[[mods]]
+modId="whip_cinematic"
+version="0.1.0"
+displayName="Whip Guardian: World Breaker"
+authors="User project"
+description='''Giant guardian cinematic skill for The Shooting Star's Stellar Remote.'''
+
+[[dependencies.whip_cinematic]]
+modId="neoforge"
+type="required"
+versionRange="[21.1,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.whip_cinematic]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.21.2)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.whip_cinematic]]
+modId="rimulib"
+type="required"
+versionRange="[1.3.0,2)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.whip_cinematic]]
+modId="geckolib"
+type="required"
+versionRange="[4.8.2,5)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.whip_cinematic]]
+modId="shooting_star_demo"
+type="required"
+versionRange="[1.6.0,2)"
+ordering="AFTER"
+side="BOTH"
